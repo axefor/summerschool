@@ -9,6 +9,8 @@ Once forked to yourself, you can sync with the original repository (in case of u
 git pull https://github.com/csc-training/summerschool.git
 ```
 
+some notes to myself...
+
 ---
 ## Notes
 - [x] Have fun!
