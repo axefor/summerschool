@@ -10,6 +10,7 @@ git pull https://github.com/csc-training/summerschool.git
 ```
 
 some notes to myself...
+and some test
 
 ---
 ## Notes
