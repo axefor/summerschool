@@ -14,6 +14,7 @@ program subroutines
   call initialize(previous)
 
   call write_field(previous)
+  write(*,*)
 
   ! compute the Laplacian
   call laplacian(current, previous)

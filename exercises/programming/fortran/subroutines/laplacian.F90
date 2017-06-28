@@ -19,8 +19,8 @@ contains
    
   subroutine laplacian(curr, prev)
     real :: i, j
-    real, intent(in) :: curr(:,:)
-    real, intent(out) :: prev(:,:)
+    real, intent(out) :: curr(:,:)
+    real, intent(in) :: prev(:,:)
     real :: nx, ny
     if (size(curr,1)==size(prev,1) .and. size(curr,2)==size(prev,2)) then
       nx=size(curr,1)
