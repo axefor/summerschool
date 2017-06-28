@@ -7,6 +7,9 @@ contains
   subroutine initialize(field0)
 ! TODO: implement a subroutine that initializes the input array
     real, intent(inout) :: field0(:,:)
+    real :: nx, ny 
+    nx=size(field0,1)
+    ny=size(field0,2)
     field0(:,:)  = 65.0 ! middle
     field0(:,1)  = 20.0 ! left
     field0(:,ny) = 70.0 ! right
