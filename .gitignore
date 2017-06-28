@@ -4,6 +4,9 @@
 *.png
 \#*
 *~ 
+Makefile
+.swp
+
 
 #ignore default binary name
 a.out
