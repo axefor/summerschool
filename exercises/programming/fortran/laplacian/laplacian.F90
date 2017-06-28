@@ -24,7 +24,11 @@ program laplacian
   ! TODO: implement Laplacian in double do-loop using prev 
   ! and saving to lapl array. Remember to evaluate it only
   ! at the inner points.
-
+  do j=2,ny-1
+    do i=2,nx-1
+      lapl(i,j) = (prev(i-1,j)-2*prev(i,j)+prev(i+1,j))/dx**2 + (prev(i,j-1)-2*prev(i,j)+prev(i,j+1))/dy**2
+    end do
+  end do
 
 
 
