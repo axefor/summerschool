@@ -6,27 +6,25 @@ contains
   subroutine read_field(field, filename)
     implicit none
 
-    real, dimension(:,:), allocatable, intent(out) :: field
+    integer :: nx, ny, i
+    real, allocatable, intent(out) :: field(:,:)
     character(len=*), intent(in) :: filename
 
 
     ! TODO: implement function that will:
     ! open the file
+    open(10,file=filename,access='stream',action='read',form='formatted')
+
     ! read the first header line to get nx and ny
+    read(10,fmt=*) nx, ny
+
     ! allocate matrix called field
+    allocate(field(nx,ny))
+
     ! read rest of the file into field
+    do i=1,nx
     ! close the file
-
-
-
-
-
-
-
-
-
-
-
+    close(10)
 
 
 
