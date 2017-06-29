@@ -1,4 +1,11 @@
 module io
+  use ISO_FORTRAN_ENV, only : REAL64
+
+  type fieldtype
+    integer :: nx, ny
+    real(kind=REAL64) :: dx, dy
+    real(kind=REAL64), allocatable :: field
+  end type fieldtype
 
 contains
 
@@ -23,6 +30,9 @@ contains
 
     ! read rest of the file into field
     do i=1,nx
+      read(10,*) field(i,:)
+    end do
+
     ! close the file
     close(10)
 
