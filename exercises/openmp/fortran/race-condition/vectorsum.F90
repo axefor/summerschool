@@ -3,11 +3,11 @@ program vectorsum
   use omp_lib
   implicit none
   integer, parameter :: ik = int64
-  integer(kind=ik), parameter :: nx = 10240_ik
+  integer(kind=ik), parameter :: nx = 102400_ik
 
   integer(kind=ik), dimension(nx) :: vecA
   integer(kind=ik) :: sum, psum, sumex
-  integer(kind=ik) :: i,j
+  integer(kind=ik) :: i
   real :: stime
 
   ! Initialization of vector
@@ -18,16 +18,22 @@ program vectorsum
   stime = omp_get_wtime()
 
   sum = 0
-  ! TODO: Parallelize the computation
-  !$omp parallel do private(i,j) shared(sum,vecA)
-  do i = 1, nx
-    do j = 1, nx
-     sum = sum + vecA(i)
-   end do
-  end do
-  !$omp end parallel do
   
-  write(*,*) omp_get_wtime()-stime
+  !$omp parallel private(i,psum) shared(vecA)
+    !$omp do
+    do i = 1, nx
+      psum = psum + vecA(i)
+    end do
+    !$omp end do
+  
+    !$omp critical(dosum)
+      sum = sum + psum
+    !$omp end critical(dosum)
+
+  !$omp end parallel
+
+  stime= omp_get_wtime()-stime
+  write(*,*) stime
 
   write(*,*) 'Sum: ', sum
 end program vectorsum
