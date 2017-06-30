@@ -19,8 +19,11 @@ program vectorsum
 
   sum = 0
   
-  !$omp parallel private(i,psum) shared(vecA)
-    !$omp do
+  !$omp parallel private(i,psum) shared(vecA) 
+
+    psum = 0
+
+    !$omp do schedule(guided)
     do i = 1, nx
       psum = psum + vecA(i)
     end do
