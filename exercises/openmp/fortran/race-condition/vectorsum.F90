@@ -1,6 +1,6 @@
 program vectorsum
-  use iso_fortran_env, only: int64
   use omp_lib
+  use iso_fortran_env, only: int64, real64
   implicit none
   integer, parameter :: ik = int64
   integer(kind=ik), parameter :: nx = 102400_ik
@@ -8,13 +8,14 @@ program vectorsum
   integer(kind=ik), dimension(nx) :: vecA
   integer(kind=ik) :: sum, psum, sumex
   integer(kind=ik) :: i
-  real :: stime
+  real(kind=real64) :: stime, ftime, stime_cpu, ftime_cpu
 
   ! Initialization of vector
   do i = 1, nx
      vecA(i) = i
   end do
   
+  call cpu_time(stime_cpu)
   stime = omp_get_wtime()
 
   sum = 0
@@ -35,8 +36,10 @@ program vectorsum
 
   !$omp end parallel
 
-  stime= omp_get_wtime()-stime
-  write(*,*) stime
+  ftime = omp_get_wtime()
+  call cpu_time(ftime_cpu)
+  write(*,*) 'omp time: ', ftime-stime
+  write(*,*) 'cpu time: ', ftime_cpu-stime_cpu
 
   write(*,*) 'Sum: ', sum
 end program vectorsum
