@@ -8,6 +8,7 @@ Makefile
 *.swp
 *.dSym
 *.x
+*.run
 
 
 #ignore default binary name
