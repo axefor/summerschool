@@ -19,10 +19,16 @@ program vectorsum
 
   stime = omp_get_wtime()
   call cpu_time(stime_cpu)
-  ! TODO:
+  
   !   Implement here the parallelized version of vector addition,
   !   vecC = vecA + vecB
-  vecC(:) = vecA(:) + vecB(:)
+  !$omp parallel shared(vecA, vecB, vecC) private(i)
+  !$omp do
+  do i=1,nx
+    vecC(i) = vecA(i) + vecB(i)
+  end do
+  !$omp end do
+  !$omp end parallel
 
   ftime = omp_get_wtime()
   call cpu_time(ftime_cpu)
