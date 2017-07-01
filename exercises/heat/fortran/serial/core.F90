@@ -21,6 +21,8 @@ contains
     nx = curr%nx
     ny = curr%ny
 
+    !$omp parallel private(i,j) shared(a,dt,prev,curr)
+    !$omp do schedule(guided)
     do j = 1, ny
        do i = 1, nx
           curr%data(i, j) = prev%data(i, j) + a * dt * &
@@ -30,6 +32,8 @@ contains
                &   prev%data(i, j+1)) / curr%dy**2)
        end do
     end do
+    !$omp end do
+    !$omp end parallel
   end subroutine evolve
 
 end module core
