@@ -3,6 +3,7 @@ program subroutines
   implicit none
 ! TODO: define the arrays
   integer :: nx, ny
+  real, allocatable :: previous(:,:), current(:,:)
 
   write (*,*) 'Give number of rows and columns for matrix A:'
   read (*,*) nx, ny
@@ -13,6 +14,7 @@ program subroutines
   call initialize(previous)
 
   call write_field(previous)
+  write(*,*)
 
   ! compute the Laplacian
   call laplacian(current, previous)
