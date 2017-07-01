@@ -4,7 +4,7 @@ program basic
 
   implicit none
   integer, parameter :: size = 100000
-  integer :: rc, myid, ntasks, count, dest, source, tag
+  integer :: rc, myid, ntasks, count, dest, source, sendTag, recvTag
   integer :: status(MPI_STATUS_SIZE)
   integer :: message(size)
   integer :: receiveBuffer(size)
@@ -22,20 +22,35 @@ program basic
   t0 = mpi_wtime()
 
   ! Send and receive as defined in the assignment
-  if ( myid < ntasks-1 ) then
+  if ( myid == 0 ) then
     dest = myid + 1
-    tag = 10 + myid
-    call mpi_send(message, count, MPI_INTEGER, dest, tag, MPI_COMM_WORLD, rc)
+    sendTag = 10 + myid
+    call mpi_send(message, count, MPI_INTEGER, dest, sendTag, MPI_COMM_WORLD, rc)
 
     write(*,'(A10,I3,A20,I8,A,I3,A,I3)') 'Sender: ', myid, &
       ' Sent elements: ',size, &
-      '. Tag: ', tag, '. Receiver: ', myid+1
+      '. Tag: ', sendTag, '. Receiver: ', myid+1
   end if
 
-  if ( myid > 0 ) then
+  if ( myid < ntasks-1 .and. myid > 0) then
+    dest = myid + 1
     source = myid - 1
-    tag = 9 + myid
-    call mpi_recv(receiveBuffer, count, MPI_INTEGER, source, tag, MPI_COMM_WORLD, status, rc)
+    sendTag = 10 + myid
+    recvTag = 9 + myid
+    call mpi_sendrecv(message, count, MPI_INTEGER, dest, sendTag, &
+      receiveBuffer, count, MPI_INTEGER, source, recvTag, MPI_COMM_WORLD, status, rc)
+
+    write(*,'(A10,I3,A20,I8,A,I3,A,I3)') 'Sender: ', myid, &
+      ' Sent elements: ',size, &
+      '. Tag: ', sendTag, '. Receiver: ', myid+1
+    write(*,'(A10,I3,A,I3)') 'Receiver: ', myid, &
+      ' First element: ', receiveBuffer(1)
+  end if
+
+  if ( myid == ntasks-1 ) then
+    source = myid - 1
+    recvTag = 9 + myid
+    call mpi_recv(receiveBuffer, count, MPI_INTEGER, source, recvTag, MPI_COMM_WORLD, status, rc)
 
     write(*,'(A10,I3,A,I3)') 'Receiver: ', myid, &
       ' First element: ', receiveBuffer(1)
