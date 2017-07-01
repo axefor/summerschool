@@ -81,6 +81,8 @@ end subroutine initialize
     ! Square of the disk radius
     radius2 = (field0%nx / 6.0_dp)**2
 
+    !$omp parallel private(i,j,ds2) shared(field0,radius2)
+    !$omp do schedule(guided)
     do j = 0, field0%ny + 1
        do i = 0, field0%nx + 1
           ds2 = int((i - field0%nx / 2.0_dp + 1)**2 + &
@@ -92,23 +94,33 @@ end subroutine initialize
           end if
        end do
     end do
+    !$omp end do
 
     ! Boundary conditions
+    !$omp do schedule(guided)
     do j = 0, field0%nx + 1
        field0%data(j, 0) = 20.0_dp
     end do
+    !$omp end do
 
+    !$omp do schedule(guided)
     do j = 0, field0%nx + 1
        field0%data(j, field0%ny + 1) = 70.0_dp
     end do
+    !$omp end do
 
+    !$omp do schedule(guided)
     do j = 0, field0%ny + 1
        field0%data(0, j) = 85.0_dp
     end do
+    !$omp end do
 
+    !$omp do schedule(guided)
     do j = 0, field0%ny+1
        field0%data(field0%nx + 1, j) = 5.0_dp
     end do
+    !$omp end do
+    !$omp end parallel
   end subroutine generate_field
 
 
