@@ -22,36 +22,25 @@ program basic
   t0 = mpi_wtime()
 
   ! Send and receive as defined in the assignment
+  dest = myid + 1
+  source = myid - 1
   if ( myid == 0 ) then
-    dest = myid + 1
-    sendTag = 10 + myid
-    call mpi_send(message, count, MPI_INTEGER, dest, sendTag, MPI_COMM_WORLD, rc)
-
-    write(*,'(A10,I3,A20,I8,A,I3,A,I3)') 'Sender: ', myid, &
-      ' Sent elements: ',size, &
-      '. Tag: ', sendTag, '. Receiver: ', myid+1
+    source = MPI_PROC_NULL
   end if
-
-  if ( myid < ntasks-1 .and. myid > 0) then
-    dest = myid + 1
-    source = myid - 1
-    sendTag = 10 + myid
-    recvTag = 9 + myid
-    call mpi_sendrecv(message, count, MPI_INTEGER, dest, sendTag, &
-      receiveBuffer, count, MPI_INTEGER, source, recvTag, MPI_COMM_WORLD, status, rc)
-
-    write(*,'(A10,I3,A20,I8,A,I3,A,I3)') 'Sender: ', myid, &
-      ' Sent elements: ',size, &
-      '. Tag: ', sendTag, '. Receiver: ', myid+1
-    write(*,'(A10,I3,A,I3)') 'Receiver: ', myid, &
-      ' First element: ', receiveBuffer(1)
-  end if
-
   if ( myid == ntasks-1 ) then
-    source = myid - 1
-    recvTag = 9 + myid
-    call mpi_recv(receiveBuffer, count, MPI_INTEGER, source, recvTag, MPI_COMM_WORLD, status, rc)
+    dest = MPI_PROC_NULL
+  end if
+  sendTag = 10 + myid
+  recvTag = 9 + myid
+  call mpi_sendrecv(message, count, MPI_INTEGER, dest, sendTag, &
+    receiveBuffer, count, MPI_INTEGER, source, recvTag, MPI_COMM_WORLD, status, rc)
 
+  if ( myid == 0 ) then 
+    write(*,'(A10,I3,A20,I8,A,I3,A,I3)') 'Sender: ', myid, &
+      ' Sent elements: ',size, &
+      '. Tag: ', sendTag, '. Receiver: ', myid+1
+  end if
+  if ( myid == ntasks-1 ) then
     write(*,'(A10,I3,A,I3)') 'Receiver: ', myid, &
       ' First element: ', receiveBuffer(1)
   end if
