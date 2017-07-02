@@ -24,14 +24,14 @@ contains
     ! Send to left, receive from right
     sendTag = 10
     recvTag = 10
-    call mpi_sendrecv(field0%data(0,1), field0%nx+2, fieldDataType, parallel%nleft, sendTag, &
-      field0%data(0,field0%ny+1), field0%nx+2, fieldDataType, parallel%nright, recvTag, comm, status, ierr)
+    call mpi_isend(field0%data(0,1), field0%nx+2, fieldDataType, parallel%nleft, sendTag, comm, status, ierr)
+    call mpi_irecv(field0%data(0,field0%ny+1), field0%nx+2, fieldDataType, parallel%nright, recvTag, comm, status, ierr)
 
     ! Send to right, receive from left
-    sendTag = 10
-    recvTag = 10
-    call mpi_sendrecv(field0%data(0,field0%ny), field0%nx+2, fieldDataType, parallel%nright, sendTag, &
-      field0%data(0,0), field0%nx+2, fieldDataType, parallel%nleft, recvTag, comm, status, ierr)
+    sendTag = 11
+    recvTag = 11
+    call mpi_isend(field0%data(0,field0%ny), field0%nx+2, fieldDataType, parallel%nright, sendTag, status, ierr)
+    call mpi_irecv(field0%data(0,0), field0%nx+2, fieldDataType, parallel%nleft, recvTag, comm, status, ierr)
 
     !  end
 
