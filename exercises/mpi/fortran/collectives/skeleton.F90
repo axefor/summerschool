@@ -5,7 +5,7 @@ program coll_exer
   integer, parameter :: n_mpi_tasks = 4
 
   integer :: ntasks, rank, ierr, i, color, sub_comm, root
-  integer, dimension(2*n_mpi_tasks) :: sendbuf, recvbuf
+  integer, dimension(2*n_mpi_tasks) :: sendBuf, recvBuf
   integer, dimension(2*n_mpi_tasks**2) :: printbuf
   integer, parameter :: comm = MPI_COMM_WORLD
 
@@ -24,16 +24,18 @@ program coll_exer
   call init_buffers
 
   ! Print data that will be sent
-  call print_buffers(sendbuf)
+  call print_buffers(sendBuf)
 
   ! TODO: use a single collective communication call (and maybe prepare
   !       some parameters for the call)
   root=0
-  call mpi_bcast(sendbuf, size(sendbuf), MPI_INTEGER, root, comm, ierr)
+  call mpi_scatter(sendBuf, size(sendBuf)/4, MPI_INTEGER, &
+    recvBuf, size(sendBuf)/4, MPI_INTEGER, root, &
+    comm, ierr)
 
   ! Print data that was received
   ! TODO: add correct buffer
-  call print_buffers(sendbuf)
+  call print_buffers(recvBuf)
 
   call mpi_finalize(ierr)
 
@@ -44,8 +46,8 @@ contains
     integer :: i
 
     do i = 1, 2*n_mpi_tasks
-       recvbuf(i) = -1
-       sendbuf(i) = i + 2*n_mpi_tasks * rank - 1
+       recvBuf(i) = -1
+       sendBuf(i) = i + 2*n_mpi_tasks * rank - 1
     end do
   end subroutine init_buffers
 
