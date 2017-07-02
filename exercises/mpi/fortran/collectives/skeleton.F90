@@ -4,9 +4,11 @@ program coll_exer
 
   integer, parameter :: n_mpi_tasks = 4
 
-  integer :: ntasks, rank, ierr, i, color, sub_comm
-  integer, dimension(2*n_mpi_tasks) :: sendbuf, recvbuf
+  integer :: ntasks, rank, ierr, i, color, sub_comm, root, sendCount
+  integer :: recvCount, displs(4)
+  integer, dimension(2*n_mpi_tasks) :: sendBuf, recvBuf
   integer, dimension(2*n_mpi_tasks**2) :: printbuf
+  integer, parameter :: comm = MPI_COMM_WORLD
 
   call mpi_init(ierr)
   call mpi_comm_size(MPI_COMM_WORLD, ntasks, ierr)
@@ -23,14 +25,27 @@ program coll_exer
   call init_buffers
 
   ! Print data that will be sent
-  call print_buffers(sendbuf)
+  call print_buffers(sendBuf)
 
   ! TODO: use a single collective communication call (and maybe prepare
   !       some parameters for the call)
+  if ( rank <2 ) then 
+    color = 1
+  else
+    color = 2
+  end if
+
+  call mpi_comm_split(comm, color, rank, sub_comm, ierr)
+  ! call mpi_comm_rank(sub_comm, rank, ierr)
+  sendCount = size(sendBuf)
+  recvCount = size(recvBuf)
+  
+  call mpi_reduce(sendBuf, recvBuf, recvCount, MPI_INTEGER, MPI_SUM, &
+    0, sub_comm, ierr)
 
   ! Print data that was received
   ! TODO: add correct buffer
-  call print_buffers(...)
+  call print_buffers(recvBuf)
 
   call mpi_finalize(ierr)
 
@@ -41,8 +56,8 @@ contains
     integer :: i
 
     do i = 1, 2*n_mpi_tasks
-       recvbuf(i) = -1
-       sendbuf(i) = i + 2*n_mpi_tasks * rank - 1
+       recvBuf(i) = -1
+       sendBuf(i) = i + 2*n_mpi_tasks * rank - 1
     end do
   end subroutine init_buffers
 

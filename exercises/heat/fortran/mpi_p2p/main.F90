@@ -16,6 +16,7 @@ program heat_solve
   real(dp) :: dt     ! Time step
   integer :: nsteps       ! Number of time steps
   integer, parameter :: image_interval = 500 ! Image output interval
+  integer, parameter :: comm = MPI_COMM_WORLD
 
   type(parallel_data) :: parallelization
   integer :: ierr
@@ -24,9 +25,9 @@ program heat_solve
 
   real(kind=dp) :: start, stop ! Timers
 
-  ! TODO start: initialize MPI
-
-  ! TODO end
+  !  start: initialize MPI
+  call mpi_init(ierr)
+  !  end
 
   call initialize(current, previous, nsteps, parallelization)
 
@@ -60,8 +61,8 @@ program heat_solve
   
   call finalize(current, previous)
 
-  ! TODO start: finalize MPI
-
-  ! TODO end
+  !  start: finalize MPI
+  call mpi_finalize(ierr)
+  !  end
 
 end program heat_solve

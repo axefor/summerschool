@@ -8,8 +8,9 @@ endif
 
 ifeq ($(COMP),gnu)
 CC=gcc
-FC=gfortran
 FCFLAGS=-Wall
+FC=gfortran-mp-6
+FCFLAGS=-pg -g -fbacktrace -fbounds-check
 endif
 
 ifeq ($(COMP),intel)
@@ -36,3 +37,4 @@ $(EXE): $(OBJ)
 
 clean:
 	-/bin/rm -f $(EXE)  a.out *.o *.mod *.png *~
+	rm -f $(EXE)  a.out *.o *.mod *.png *~

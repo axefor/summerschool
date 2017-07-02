@@ -13,14 +13,27 @@ contains
     type(field), intent(inout) :: field0
     type(parallel_data), intent(in) :: parallel
 
-    integer :: ierr
+    integer :: ierr, sendTag, recvTag
+    integer :: status(MPI_STATUS_SIZE)
+    integer, parameter :: comm = MPI_COMM_WORLD
+    integer, parameter :: fieldDataType = MPI_DOUBLE_PRECISION
+    integer :: myRank
 
-    ! TODO start: implement halo exchange
+    call mpi_comm_rank(comm, myRank, ierr)
+    !  start: implement halo exchange
     ! Send to left, receive from right
+    sendTag = 10
+    recvTag = 10
+    call mpi_sendrecv(field0%data(0,1), field0%nx+2, fieldDataType, parallel%nleft, sendTag, &
+      field0%data(0,field0%ny+1), field0%nx+2, fieldDataType, parallel%nright, recvTag, comm, status, ierr)
 
     ! Send to right, receive from left
+    sendTag = 10
+    recvTag = 10
+    call mpi_sendrecv(field0%data(0,field0%ny), field0%nx+2, fieldDataType, parallel%nright, sendTag, &
+      field0%data(0,0), field0%nx+2, fieldDataType, parallel%nleft, recvTag, comm, status, ierr)
 
-    ! TODO end
+    !  end
 
   end subroutine exchange
 
@@ -34,7 +47,8 @@ contains
 
     implicit none
 
-    type(field), intent(inout) :: curr, prev
+    type(field), intent(in) :: prev
+    type(field), intent(inout) :: curr
     real(dp) :: a, dt
     integer :: i, j, nx, ny
 

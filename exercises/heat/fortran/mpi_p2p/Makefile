@@ -1,4 +1,4 @@
-COMP=cray
+COMP=gnu
 
 COMMONDIR=../../common
 
@@ -12,7 +12,7 @@ LIBS=-lpng -lz
 endif
 
 ifeq ($(COMP),gnu)
-FC=mpif90
+FC=mpif90-openmpi-mp
 CC=gcc
 FCFLAGS=-O3 -Wall 
 CCFLAGS=-O3 -Wall -I$(COMMONDIR)

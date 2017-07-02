@@ -4,10 +4,12 @@ program basic
 
   implicit none
   integer, parameter :: size = 10000000
+  character(len=25) :: arg
+  integer :: size
   integer :: rc, myid, ntasks, count, dest, source, sendTag, recvTag
   integer :: status(MPI_STATUS_SIZE)
-  integer :: message(size)
-  integer :: receiveBuffer(size)
+  integer, allocatable :: message(:)
+  integer, allocatable :: receiveBuffer(:)
 
   real(REAL64) :: t0, t1 
 
@@ -15,6 +17,10 @@ program basic
   call mpi_comm_rank(MPI_COMM_WORLD, myid, rc)
   call mpi_comm_size(MPI_COMM_WORLD, ntasks, rc)
 
+  call get_command_argument(1,arg)
+  read(arg,*) size
+  allocate(message(size))
+  allocate(receiveBuffer(size))
   message = myid
 
   ! Start measuring the time spent in communication
