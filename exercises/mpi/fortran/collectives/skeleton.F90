@@ -4,7 +4,8 @@ program coll_exer
 
   integer, parameter :: n_mpi_tasks = 4
 
-  integer :: ntasks, rank, ierr, i, color, sub_comm, root
+  integer :: ntasks, rank, ierr, i, color, sub_comm, root, sendCount
+  integer :: recvCounts(4), displs(4)
   integer, dimension(2*n_mpi_tasks) :: sendBuf, recvBuf
   integer, dimension(2*n_mpi_tasks**2) :: printbuf
   integer, parameter :: comm = MPI_COMM_WORLD
@@ -28,9 +29,13 @@ program coll_exer
 
   ! TODO: use a single collective communication call (and maybe prepare
   !       some parameters for the call)
-  root=0
-  call mpi_scatter(sendBuf, size(sendBuf)/4, MPI_INTEGER, &
-    recvBuf, size(sendBuf)/4, MPI_INTEGER, root, &
+  root = 1
+  sendCount = size(sendBuf)
+  recvCounts = (/ 1, 1, 2, 4 /)
+  displs = (/ 0, 1, 2, 4 /)
+  
+  call mpi_gatherv(sendBuf, recvCounts(rank+1), MPI_INTEGER, &
+    recvBuf, recvCounts, displs, MPI_INTEGER, root, &
     comm, ierr)
 
   ! Print data that was received
