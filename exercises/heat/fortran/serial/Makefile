@@ -12,7 +12,7 @@ LIBS=-lpng -lz
 endif
 
 ifeq ($(COMP),gnu)
-FC=mpif90-openmpi-mp
+FC=gfortran-mp-6
 CC=gcc
 FCFLAGS=-O3 -Wall 
 CCFLAGS=-O3 -Wall -I$(COMMONDIR)
@@ -20,7 +20,7 @@ LDFLAGS=
 LIBS=-lpng
 endif
 
-EXE=heat_mpi
+EXE=heat_serial.x
 OBJS=main.o heat_mod.o core.o setup.o utilities.o io.o pngwriter_mod.o
 OBJS_PNG=$(COMMONDIR)/pngwriter.o
 
