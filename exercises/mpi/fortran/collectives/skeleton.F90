@@ -29,12 +29,19 @@ program coll_exer
 
   ! TODO: use a single collective communication call (and maybe prepare
   !       some parameters for the call)
-  sendCount = 2
-  recvCount = 2
+  if ( rank <2 ) then 
+    color = 1
+  else
+    color = 2
+  end if
+
+  call mpi_comm_split(comm, color, rank, sub_comm, ierr)
+  ! call mpi_comm_rank(sub_comm, rank, ierr)
+  sendCount = size(sendBuf)
+  recvCount = size(recvBuf)
   
-  call mpi_alltoall(sendBuf, sendCount, MPI_INTEGER, &
-    recvBuf, recvCount, MPI_INTEGER, &
-    comm, ierr)
+  call mpi_reduce(sendBuf, recvBuf, recvCount, MPI_INTEGER, MPI_SUM, &
+    0, sub_comm, ierr)
 
   ! Print data that was received
   ! TODO: add correct buffer
