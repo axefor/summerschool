@@ -6,7 +6,8 @@ program datatype2
 
   integer, dimension(8,8) :: array
   integer :: rank, ierr
-  !TODO: declare variable for block datatype
+  ! declare variable for block datatype
+  integer :: mpiDataType, mpiStatus(MPI_STATUS_SIZE)
   integer, dimension(2) :: sizes, subsizes, offsets
   integer :: i, j
   
@@ -25,14 +26,22 @@ program datatype2
   end if
 
   !TODO: create a datatype for a subblock [2:5][3:5] of the 8x8 matrix
-  !sizes(1) =
-  !sizes(2) =
-  !subsizes(1) =
-  !subsizes(2) =
-  !offsets(1) = 
-  !offsets(2) = 
+  sizes(1) = 8
+  sizes(2) = 8
+  subsizes(1) = 3
+  subsizes(2) = 2
+  offsets(1) = 1
+  offsets(2) = 2
+  call mpi_type_create_subarray(2, sizes, subsizes, offsets, &
+    MPI_ORDER_FORTRAN, MPI_INTEGER, mpiDataType, ierr)
+  call mpi_type_commit(mpiDataType, ierr)
 
-  !TODO: send a block of a matrix from rank 0 to rank 1
+  ! send a block of a matrix from rank 0 to rank 1
+  if (rank == 0) then
+    call mpi_send( array, 1, mpiDataType, 1, 11, MPI_COMM_WORLD, ierr)
+  else 
+    call mpi_recv( array, 1, mpiDataType, 0, 11, MPI_COMM_WORLD, mpiStatus, ierr)
+  end if
 
   ! Print out the result
   if (rank == 1) then
@@ -41,7 +50,8 @@ program datatype2
      end do
   end if
       
-  !TODO: free mpi datatype	
+  ! free mpi datatype	
+  call mpi_type_free(mpiDataType, ierr)
 
   call mpi_finalize(ierr)
 
