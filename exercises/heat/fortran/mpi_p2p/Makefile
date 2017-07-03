@@ -12,7 +12,7 @@ LIBS=-lpng -lz
 endif
 
 ifeq ($(COMP),gnu)
-FC=mpif90-openmpi-mp
+FC=mpif90
 CC=gcc
 FCFLAGS=-O3 -Wall 
 CCFLAGS=-O3 -Wall -I$(COMMONDIR)
