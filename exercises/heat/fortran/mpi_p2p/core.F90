@@ -13,8 +13,9 @@ contains
     type(field), intent(inout) :: field0
     type(parallel_data), intent(in) :: parallel
 
-    integer :: ierr, sendTag, recvTag
-    integer :: status(MPI_STATUS_SIZE)
+    integer :: ierr, sendTag, recvTag, a1, a2, a3, a4
+    integer :: request(4)
+    integer :: status(MPI_STATUS_SIZE,4)
     integer, parameter :: comm = MPI_COMM_WORLD
     integer, parameter :: fieldDataType = MPI_DOUBLE_PRECISION
     integer :: myRank
@@ -24,15 +25,21 @@ contains
     ! Send to left, receive from right
     sendTag = 10
     recvTag = 10
-    call mpi_isend(field0%data(0,1), field0%nx+2, fieldDataType, parallel%nleft, sendTag, comm, status, ierr)
-    call mpi_irecv(field0%data(0,field0%ny+1), field0%nx+2, fieldDataType, parallel%nright, recvTag, comm, status, ierr)
+    call mpi_isend(field0%data(0,1), field0%nx+2, fieldDataType, parallel%nleft, sendTag, comm, request(1), ierr)
+!    call mpi_isend(field0%data(0,1), field0%nx+2, fieldDataType, parallel%nleft, sendTag, comm, a1, ierr)
+    call mpi_irecv(field0%data(0,field0%ny+1), field0%nx+2, fieldDataType, parallel%nright, recvTag, comm, request(2), ierr)
+!    call mpi_irecv(field0%data(0,field0%ny+1), field0%nx+2, fieldDataType, parallel%nright, recvTag, comm, a2, ierr)
 
     ! Send to right, receive from left
     sendTag = 11
     recvTag = 11
-    call mpi_isend(field0%data(0,field0%ny), field0%nx+2, fieldDataType, parallel%nright, sendTag, status, ierr)
-    call mpi_irecv(field0%data(0,0), field0%nx+2, fieldDataType, parallel%nleft, recvTag, comm, status, ierr)
+    call mpi_isend(field0%data(0,field0%ny), field0%nx+2, fieldDataType, parallel%nright, sendTag, comm, request(3), ierr)
+!    call mpi_isend(field0%data(0,field0%ny), field0%nx+2, fieldDataType, parallel%nright, sendTag, comm, a3, ierr)
+    call mpi_irecv(field0%data(0,0), field0%nx+2, fieldDataType, parallel%nleft, recvTag, comm, request(4), ierr)
+!    call mpi_irecv(field0%data(0,0), field0%nx+2, fieldDataType, parallel%nleft, recvTag, comm, a4, ierr)
 
+!    call mpi_waitall(4, (/ a1, a2, a3, a4 /), status, ierr)
+    call MPI_WAITALL(4, REQUEST, STATUS, ierr)
     !  end
 
   end subroutine exchange

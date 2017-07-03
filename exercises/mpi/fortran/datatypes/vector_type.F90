@@ -3,8 +3,9 @@ program datatype1
   implicit none
 
   integer, dimension(8,8) :: array
-  integer :: rank, ierr
-  !TODO: declare variable for datatype
+  integer :: rank, ierr, dest, source, tag
+  ! declare variable for datatype
+  integer :: mpiDataType, status(MPI_STATUS_SIZE)
   integer :: i, j
 
   call mpi_init(ierr)
@@ -21,18 +22,31 @@ program datatype1
      array(:,:) = 0
   end if
 
-  !TODO: create datatype describing one row, use mpi_type_vector
+  ! create datatype describing one row, use mpi_type_vector
+  call mpi_type_vector( size(array, 2), 1, size(array,1), MPI_INTEGER, mpiDataType, ierr)
+  call mpi_type_commit( mpiDataType, ierr)
 
-  !TODO: send first row of matrix from rank 0 to 1
+  ! send first row of matrix from rank 0 to 1
+  dest = 1
+  source = 0
+  tag = 11
+
+  if (rank == 0) then
+    call mpi_send( array, 1, mpiDataType, dest, tag, MPI_COMM_WORLD, ierr)
+  else
+    call mpi_recv( array, 1, mpiDataType, source, tag, MPI_COMM_WORLD, status, ierr)
+  end if
 
   ! Print out the result
-  if (rank == 1) then
+  if (rank == 1 .or. rank == 0) then
      do i=1,8
         write(*,'(8I3)') array(i, :)
      end do
   end if
 
-  !TODO free datatype
+  write(*,*) 'Im here  ', rank
+  ! free datatype
+  call mpi_type_free( mpiDataType, ierr)
 
   call mpi_finalize(ierr)
 
