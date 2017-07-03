@@ -28,7 +28,7 @@ program pario
 
   localvector = [(i + my_id * localsize, i=1,localsize)]
 
-  call single_writer()
+  call for_himself_writer()
 
   deallocate(localvector)
   call mpi_finalize(rc)
@@ -52,11 +52,26 @@ contains
         write(*,*) 'rank, source', my_id, source
         call mpi_recv(fullvector(i*size(localvector)), size(localvector), MPI_INTEGER, source, recvTag, MPI_COMM_WORLD, status, rc)
       end do
-      open(11, file='output.out', access="stream", action="write", form="unformatted")
-      write(11, *) fullvector
+      open(11, file='output.out', access="stream", action="write", form="unformatted", status="replace")
+      write(11) fullvector(:)
       close(11)
     end if
 
   end subroutine single_writer
+
+  subroutine for_himself_writer()
+    implicit none
+    integer :: unitNumber
+    character(len=5) :: fname
+
+    unitNumber = 10 + my_id
+    write(fname, "(A4,I1)") "file", my_id
+
+    write(*,*) unitNumber
+    open(unit=unitNumber, file=fname, access="stream", action="write", form="unformatted", status="replace")
+    write(unit=unitNumber) localvector(:)
+    close(unit=unitNumber)
+
+  end subroutine for_himself_writer
 
 end program pario
