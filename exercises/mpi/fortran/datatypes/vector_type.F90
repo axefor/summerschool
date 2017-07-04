@@ -5,7 +5,7 @@ program datatype1
   integer, dimension(8,8) :: array
   integer :: rank, ierr, dest, source, tag
   ! declare variable for datatype
-  integer :: mpiDataType, status(MPI_STATUS_SIZE)
+  integer :: mpiDataType, mpiStatus(MPI_STATUS_SIZE)
   integer :: i, j
 
   call mpi_init(ierr)
@@ -34,7 +34,7 @@ program datatype1
   if (rank == 0) then
     call mpi_send( array, 1, mpiDataType, dest, tag, MPI_COMM_WORLD, ierr)
   else
-    call mpi_recv( array, 1, mpiDataType, source, tag, MPI_COMM_WORLD, status, ierr)
+    call mpi_recv( array, 1, mpiDataType, source, tag, MPI_COMM_WORLD, mpiStatus, ierr)
   end if
 
   ! Print out the result

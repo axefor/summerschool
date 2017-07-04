@@ -30,20 +30,30 @@ program datatype_struct
       particles(i)%label = 'Xe'
     end do  
   end if
+  write(*,*) particles(n)%coords(1)
   
-  ! TODO: define the datatype for type particle
+  ! define the datatype for type particle
+  blocklen = (/ 3, 1, 2 /)
+  call mpi_get_address(particles(1)%coords, disp(1), ierror)
+  call mpi_get_address(particles(1)%charge, disp(2), ierror)
+  call mpi_get_address(particles(1)%label, disp(3), ierror)
+  disp = disp - disp(1)
+  types = (/ MPI_REAL, MPI_INTEGER, MPI_CHARACTER /)
+  call mpi_type_create_struct( cnt, blocklen, disp, types, particle_mpi_type, ierror)
 
-  ! TODO: Check extent. 
+  ! Check extent. 
+  call mpi_type_get_extent(particle_mpi_type, lb, extent, ierror)
   ! (Not really neccessary on most systems.)
   ! TODO: resize the particle_mpi_type if needed
   if(extent /= disp(2)-disp(1)) then
   ! TODO: resize the particle_mpi_type if needed
   end if
 
+  call mpi_type_commit(particle_mpi_type, ierror)
 
   t1=MPI_WTIME()
   if(myid == 0) then
-     do i=1,1000
+     do i=1, 1000
         call MPI_SEND(particles, n, particle_mpi_type, 1, i, &
              MPI_COMM_WORLD,ierror)
      end do
