@@ -15,15 +15,42 @@ contains
 
     integer :: ierr
 
+    integer :: mpiStatus(MPI_STATUS_SIZE)
+    integer, parameter :: comm = MPI_COMM_WORLD
+    integer :: fieldDataType = MPI_DOUBLE_PRECISION
+    integer :: myRank
+    
     ! TODO start: implement 2D halo exchange using MPI datatypes
 
     ! Send to left, receive from right
+    sendTag = 10
+    recvTag = 10
+    fieldDataType = MPI_DOUBLE_PRECISION
+    call mpi_sendrecv( field0%data(0,1), field0%nx+2, fieldDataType, parallel%nleft, sendTag, comm, &
+      field0%data(0,field0%ny+1), field0%nx+2, fieldDataType, parallel%nright, recvTag, comm, mpiStatus, ierr)
 
     ! Send to right, receive from left
+    sendTag = 11
+    recvTag = 11
+    fieldDataType = MPI_DOUBLE_PRECISION
+    call mpi_sendrecv( field0%data(0,field0%ny), field0%nx+2, fieldDataType, parallel%nright, sendTag, comm, &
+      field0%data(0,0), field0%nx+2, fieldDataType, parallel%nleft, recvTag, comm, mpiStatus, ierr)
 
+    ! Create new datatype before sending/receiving to/from up/down
+    blocklen = 1
+    stride = field0%nx+2
+    call mpi_type_vector( field0%ny+2, blocklen, stride, fieldDataType)
     ! Send to up receive from down
+    sendTag = 12
+    recvTag = 12
+    call mpi_sendrecv( field0%data(1,0), field0%ny+2, fieldDataType, parallel%nup, sendTag, comm, &
+      field0%data(field0%nx+1,0), field0%ny+2, fieldDataType, parallel%ndown, recvTag, comm, mpiStatus, ierr)
 
     ! Send to the down, receive from up
+    sendTag = 13
+    recvTag = 13
+    call mpi_sendrecv( field0%data(field0%nx,0), field0%ny+2, fieldDataType, parallel%ndown, sendTag, comm, &
+      field0%data(0,0), field0%ny+2, fieldDataType, parallel%nup, recvTag, comm, mpiStatus, ierr)
 
     ! TODO end
 
