@@ -13,7 +13,7 @@ program exchange
 
   message = myid
 
-  ! TODO: Implement sending and receiving as defined in the assignment
+  ! Implement sending and receiving as defined in the assignment
   if ( myid == 0 ) then
     source = 1
     destination = 1

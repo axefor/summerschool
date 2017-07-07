@@ -5,6 +5,7 @@ program coll_exer
   integer, parameter :: n_mpi_tasks = 4
 
   integer :: ntasks, rank, ierr, i, color, sub_comm, root, sendCount
+  integer :: request, status(MPI_STATUS_SIZE)
   integer :: recvCount, displs(4)
   integer, dimension(2*n_mpi_tasks) :: sendBuf, recvBuf
   integer, dimension(2*n_mpi_tasks**2) :: printbuf
@@ -40,9 +41,10 @@ program coll_exer
   sendCount = size(sendBuf)
   recvCount = size(recvBuf)
   
-  call mpi_reduce(sendBuf, recvBuf, recvCount, MPI_INTEGER, MPI_SUM, &
-    0, sub_comm, ierr)
+  call mpi_ireduce(sendBuf, recvBuf, recvCount, MPI_INTEGER, MPI_SUM, &
+    0, sub_comm, request, ierr)
 
+  call mpi_wait(request, status, ierr)
   ! Print data that was received
   ! TODO: add correct buffer
   call print_buffers(recvBuf)
